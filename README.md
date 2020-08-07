@@ -13,7 +13,7 @@ Delivery is saved in database file, plus sent via webkook on main Discord server
 * Tracker is standalone file - no need to install anything
 
 ## How to use it?
-1. Download latest release of EXE tracker
+1. Download latest release of EXE tracker - can be found on Discord server below
 2. Download and install latest release of [ETCARS plugin](https://etcars.jammerxd.com/)
 3. Launch tracker, follow the instructions for first logging in
 4. Launch game, click "OK" on SDK features (before selecting profile)
@@ -21,4 +21,4 @@ Delivery is saved in database file, plus sent via webkook on main Discord server
 
 
 **NOTE:** This is only alpha version of tracker, therefore it can contain some bugs. 
-Join [Support Discord server](https://discord.com/invite/KuqEDyP) (containing tracker file and bot) in order to test it.
+Join [Alpha testing Discord server](https://discord.com/invite/KuqEDyP) (containing tracker file and bot) in order to test it.
