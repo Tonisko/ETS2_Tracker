@@ -17,7 +17,7 @@ try:
     print('Logged in!')
     time.sleep(2)
 except FileNotFoundError:
-    us = input('Please type your Discord tag WITHOUT HASHTAG (ex.: Tonisko5799): ')
+    us = input('Please type your Discord tag WITHOUT HASHTAG (ex.: Tonisko5799): ') # Database raises error while creation when there is '#'
     na = input('Please put your nick for statistics: ')
     js = {"username": us, "nick": na}
     j = json.dumps(js)
@@ -59,7 +59,7 @@ while True:
         time.sleep(2)
         try:
             s = socket.socket()
-            s.connect(('127.0.0.1', 30001))
+            s.connect(('127.0.0.1', 30001)) # Connetion to the ETCARS
             _data = s.recv(1024).decode('utf-8')
             s.close()
             time.sleep(5)
@@ -70,7 +70,7 @@ while True:
         print(Fore.GREEN + 'ATS detected! Checking plugin...')
         try:
             s = socket.socket()
-            s.connect(('127.0.0.1', 30001))
+            s.connect(('127.0.0.1', 30001)) # Connetion to the ETCARS
             _data = s.recv(1024).decode('utf-8')
             s.close()
             time.sleep(5)
@@ -85,7 +85,7 @@ while True:
             print("Checking again in: " + Fore.YELLOW + str(i))
 
 s = socket.socket()
-s.connect(('127.0.0.1', 30001))
+s.connect(('127.0.0.1', 30001)) # Connetion to the ETCARS
 
 
 def refresh():
@@ -127,21 +127,11 @@ def tracker():
                 if d["data"]["jobData"]["status"] is 2:
                     print(Fore.GREEN + 'Job finished! Sending to API...')
                     timetaken = d["data"]["jobData"]["realTimeTaken"]
-                    hrs = 0
-                    _time = 0
-                    if timetaken < 60000:
-                        _time = 0
-                        hrs = 0
-                    elif 60000 < timetaken < 3600000:
-                        _time = timetaken / 60000
-                        hrs = 0
-                    elif timetaken > 3600000:
-                        _time = timetaken / 60000
-                        hrs = _time / 60
+                    _time = (timetaken / (1000 * 60)) % 60
+                    hrs = (timetaken / (1000 * 60 * 60))
                     _timee = round(_time, 0)
                     _hrs = round(hrs, 0)
                     distance = d["data"]["jobData"]["distanceDriven"]
-                    _distance = round(distance, 1)
                     cargo = d["data"]["jobData"]["cargo"]
                     source = d["data"]["jobData"]["sourceCity"]
                     sourcec = d["data"]["jobData"]["sourceCompany"]
@@ -157,7 +147,8 @@ def tracker():
                     brand = d["data"]["jobData"]["truckMake"]
                     model = d["data"]["jobData"]["truckModel"]
                     fuel = d["data"]["jobData"]["fuelBurned"]
-                    consumption = d["data"]["jobData"]["fuelBurned"] * 100 / _distance
+                    consumption = d["data"]["jobData"]["fuelBurned"] * 100 / distance
+                    _distance = round(distance, 1)
                     _consumption = round(consumption, 2)
                     _fuel = round(fuel, 0)
                     wr = {"user": user, "name": _name, "cargo": cargo, "source": "{}, {}".format(source, sourcec),
@@ -167,28 +158,19 @@ def tracker():
                           "Game": game, "mass": mass, "Truck": "{} {}".format(brand, model)}
                     w = json.dumps(wr)
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock.connect(('ip_address', 9999))  # IP address and port for data proceeding
+                    sock.connect(('ip_address', 4564))
                     sock.send(w.encode())
                     sock.close()
                     break
+
                 if d["data"]["jobData"]["status"] is 3:
                     print(Fore.GREEN + 'Job cancelled! Sending to API...')
                     timetaken = d["data"]["jobData"]["realTimeTaken"]
-                    hrs = 0
-                    _time = 0
-                    if timetaken < 60000:
-                        _time = 0
-                        hrs = 0
-                    elif timetaken in range(60000, 3600000):
-                        _time = timetaken / 60000
-                        hrs = 0
-                    elif timetaken > 3600000:
-                        _time = timetaken / 60000
-                        hrs = _time / 60
+                    _time = (timetaken / (1000 * 60)) % 60
+                    hrs = (timetaken / (1000 * 60 * 60))
                     _timee = round(_time, 0)
                     _hrs = round(hrs, 0)
                     distance = d["data"]["jobData"]["distanceDriven"]
-                    _distance = round(distance, 1)
                     cargo = d["data"]["jobData"]["cargo"]
                     source = d["data"]["jobData"]["sourceCity"]
                     sourcec = d["data"]["jobData"]["sourceCompany"]
@@ -204,7 +186,8 @@ def tracker():
                     brand = d["data"]["jobData"]["truckMake"]
                     model = d["data"]["jobData"]["truckModel"]
                     fuel = d["data"]["jobData"]["fuelBurned"]
-                    consumption = d["data"]["jobData"]["fuelBurned"] * 100 / _distance
+                    consumption = d["data"]["jobData"]["fuelBurned"] * 100 / distance
+                    _distance = round(distance, 1)
                     _consumption = round(consumption, 2)
                     _fuel = round(fuel, 0)
                     wr = {"user": user, "name": _name, "cargo": cargo, "source": "{}, {}".format(source, sourcec),
@@ -214,7 +197,7 @@ def tracker():
                           "Game": game, "mass": mass, "Truck": "{} {}".format(brand, model)}
                     w = json.dumps(wr)
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock.connect(('ip_address', 9999))  # IP address and port for data proceeding
+                    sock.connect(('ip_address', 4564))
                     sock.send(w.encode())
                     sock.close()
                     break
@@ -229,7 +212,8 @@ def tracker():
                     time.sleep(3)
                 if d["data"]["jobData"]["status"] is 1:
                     break
-        except:
+        except Exception as e:
+            print(e)
             break
 
 
