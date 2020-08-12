@@ -218,20 +218,20 @@ def tracker():
 
 
 class base:
-    vehicle_list = ["daf", "iveco", "man", "mercedes-benz",
-                    "renault", "scania", "volvo", "peterbilt", "kenworth"]
     start_time = int(time.time())
 
 
 def rich_presence():
     global rpc, d
     if is_running("eurotrucks2.exe"):
-        rpc = Presence("529016610137309184")  # IDs thanks to open-source project SCS-RPC
+        rpc = Presence("731909306256982028")
+        large_image = 'untitled-1'
         rpc.connect()
         mult = 3.6
         sp, _sp = 'km/h', 'km'
     elif is_running("amtrucks.exe"):
-        rpc = Presence("529069002874421249")
+        rpc = Presence("743029516083134494")
+        large_image = 'untitled-3'
         rpc.connect()
         mult = 2.24
         sp, _sp = 'mph', 'mi'
@@ -243,7 +243,8 @@ def rich_presence():
             elif d["data"]["telemetry"]["job"]["onJob"] is True:
                 details = "🚚 {} -> {} | {} km left".format(d["data"]["jobData"]["sourceCity"],
                                                             d["data"]["jobData"]["destinationCity"],
-                                                            round(d["data"]["telemetry"]["navigation"]["distance"] / 1000))
+                                                            round(d["data"]["telemetry"]["navigation"][
+                                                                      "distance"] / 1000))
             if d["data"]["telemetry"]["game"]["isMultiplayer"] is True:
                 state = "🌐 Multiplayer | {} {}".format(speed, sp)
             elif d["data"]["telemetry"]["game"]["isMultiplayer"] is False:
@@ -251,17 +252,14 @@ def rich_presence():
             start = base.start_time
             small_text = "{} {} | {} {}".format(d["data"]["telemetry"]["truck"]["make"],
                                                 d["data"]["telemetry"]["truck"]["model"],
-                                                d["data"]["telemetry"]["truck"]["odometer"],
+                                                round(d["data"]["telemetry"]["truck"]["odometer"], 1),
                                                 _sp)
-            vehicle = d["data"]["telemetry"]["truck"]["makeID"]
-            if vehicle not in base.vehicle_list:
-                vehicle = "unknown"
-            small_image = vehicle
-            large_image = "cover"
+            small_image = 'untitled-2'
             rpc.update(details=details, state=state, start=start, small_text=small_text, small_image=small_image,
                        large_image=large_image)
             time.sleep(5)
-        except:
+        except Exception as e:
+            print(e)
             break
 
 
