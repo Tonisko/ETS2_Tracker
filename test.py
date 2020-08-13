@@ -100,10 +100,18 @@ def refresh():
             time.sleep(1)
             index = 0
         except JSONDecodeError:
+            print('Connection failed. Trying again...')
             index += 1
             if index == 20:
-                d = {} # "Deletes" data so other loops raises exception to shut down, game should shut down completely after about 20 seconds (in my case at least)
-                break
+                try:
+                    print('Error. Trying to reconnect...')
+                    s.close()
+                    time.sleep(1)
+                    s = socket.socket()
+                    s.connect(('127.0.0.1', 30001))
+                except:
+                    d = {}
+                    break
             time.sleep(1)
 
 
