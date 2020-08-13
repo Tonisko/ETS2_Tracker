@@ -10,6 +10,7 @@ from colorama import Fore, ansi, init
 
 init(autoreset=True)
 
+# "logging in" - for job logging purposes
 try:
     f = open('credentials.json', 'r+')
     _f = f.read()
@@ -37,7 +38,7 @@ _name = j["nick"]
 d = {}
 
 
-def is_running(name):
+def is_running(name): # Checks for running game
     for proc in psutil.process_iter():
         try:
             pinfo = proc.as_dict(attrs=['pid', 'name'])
@@ -52,7 +53,7 @@ def is_running(name):
 print(Fore.GREEN + f'Welcome, {_name}!')
 time.sleep(2)
 
-while True:
+while True: # Checking which game is actually running and attempting to connect to the plugin only once
     if is_running("eurotrucks2.exe"):
         print(ansi.clear_screen())
         print(Fore.GREEN + 'ETS2 detected! Checking plugin...')
@@ -85,7 +86,7 @@ while True:
             print("Checking again in: " + Fore.YELLOW + str(i))
 
 s = socket.socket()
-s.connect(('127.0.0.1', 30001)) # Connetion to the ETCARS
+s.connect(('127.0.0.1', 30001)) # Connetion to the ETCARS for tracker and RPC
 
 
 def refresh():
@@ -100,13 +101,13 @@ def refresh():
             index = 0
         except JSONDecodeError:
             index += 1
-            if index == 30:
-                d = {}
+            if index == 20:
+                d = {} # "Deletes" data so other loops raises exception to shut down, game should shut down completely after about 20 seconds (in my case at least)
                 break
-            time.sleep(0.5)
+            time.sleep(1)
 
 
-def tracker():
+def tracker(): # Complete base for job checking and sending
     global d
     while True:
         try:
@@ -221,7 +222,7 @@ class base:
     start_time = int(time.time())
 
 
-def rich_presence():
+def rich_presence(): # Discord Rich Presence
     global rpc, d
     if is_running("eurotrucks2.exe"):
         rpc = Presence("731909306256982028")
