@@ -98,28 +98,11 @@ def refresh(): # Base for getting info from plugin
             d = json.loads(data)
             time.sleep(1)
             index = 0
-        except JSONDecodeError: # If tracker retrieves incomplete JSON from plugin, tries again.
-            # If runs out of tries (10), reconnects to the plugin (usually helps). Also checks for game, to identify if game is running so it can retry, or shut down.
+        except JSONDecodeError: # If tracker retrieves incomplete JSON from plugin, tries again, as fast as possible. This somehow makes data corrent again.
             if is_running("eurotrucks2.exe"):
                 print('Error. Trying again...')
-                time.sleep(1)
-                index += 1
-                if index == 10:
-                    s.close()
-                    s = socket.socket()
-                    s.connect(('127.0.0.1', 30001))
-                    time.sleep(1)
-                    index = 0
             elif is_running("amtrucks.exe"):
                 print('Error. Trying again...')
-                time.sleep(1)
-                index += 1
-                if index == 10:
-                    s.close()
-                    s = socket.socket()
-                    s.connect(('127.0.0.1', 30001))
-                    time.sleep(1)
-                    index = 0
             else:
                 d = {}
                 break
