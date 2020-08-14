@@ -3,6 +3,7 @@ import json
 import time
 import psutil
 import sys
+from math import floor
 from pypresence import Presence
 from threading import Thread
 from json import JSONDecodeError
@@ -138,8 +139,8 @@ def tracker(): # Complete base for job checking and sending
                     timetaken = d["data"]["jobData"]["realTimeTaken"]
                     _time = (timetaken / (1000 * 60)) % 60
                     hrs = (timetaken / (1000 * 60 * 60))
-                    _timee = round(_time, 0)
-                    _hrs = round(hrs, 0)
+                    _timee = floor(_time)
+                    _hrs = floor(hrs)
                     distance = d["data"]["jobData"]["distanceDriven"]
                     cargo = d["data"]["jobData"]["cargo"]
                     source = d["data"]["jobData"]["sourceCity"]
@@ -177,8 +178,8 @@ def tracker(): # Complete base for job checking and sending
                     timetaken = d["data"]["jobData"]["realTimeTaken"]
                     _time = (timetaken / (1000 * 60)) % 60
                     hrs = (timetaken / (1000 * 60 * 60))
-                    _timee = round(_time, 0)
-                    _hrs = round(hrs, 0)
+                    _timee = floor(_time)
+                    _hrs = floor(hrs)
                     distance = d["data"]["jobData"]["distanceDriven"]
                     cargo = d["data"]["jobData"]["cargo"]
                     source = d["data"]["jobData"]["sourceCity"]
