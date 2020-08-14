@@ -54,28 +54,29 @@ def is_running(name): # Checks for running game
 print(Fore.GREEN + f'Welcome, {_name}!')
 time.sleep(2)
 
-while True: # Checking which game is actually running and attempting to connect to the plugin only once
+while True: # Checking which game is running and attempting to connect to the plugin
     if is_running("eurotrucks2.exe"):
         print(ansi.clear_screen())
         print(Fore.GREEN + 'ETS2 detected! Checking plugin...')
         time.sleep(2)
         try:
             s = socket.socket()
-            s.connect(('127.0.0.1', 30001)) # Connetion to the ETCARS
-            _data = s.recv(1024).decode('utf-8')
-            s.close()
-            time.sleep(5)
+            s.connect(('127.0.0.1', 30001))
+            data = s.recv(20000).decode('utf-8')[8:]
+            d = json.loads(data)
+            time.sleep(1)
             break
-        except:
+        except Exception as e:
+            print(e)
             print('Plugin not loaded yet, refreshing...')
     elif is_running("amtrucks.exe"):
         print(Fore.GREEN + 'ATS detected! Checking plugin...')
         try:
             s = socket.socket()
-            s.connect(('127.0.0.1', 30001)) # Connetion to the ETCARS
-            _data = s.recv(1024).decode('utf-8')
-            s.close()
-            time.sleep(5)
+            s.connect(('127.0.0.1', 30001))
+            data = s.recv(20000).decode('utf-8')[8:]
+            d = json.loads(data)
+            time.sleep(1)
             break
         except:
             print('Plugin not loaded yet, refreshing...')
@@ -86,11 +87,8 @@ while True: # Checking which game is actually running and attempting to connect 
             time.sleep(1)
             print("Checking again in: " + Fore.YELLOW + str(i))
 
-s = socket.socket()
-s.connect(('127.0.0.1', 30001)) # Connetion to the ETCARS for tracker and RPC
 
-
-def refresh():
+def refresh(): # Base for getting info from plugin
     global d
     global s
     index = 0
@@ -100,20 +98,31 @@ def refresh():
             d = json.loads(data)
             time.sleep(1)
             index = 0
-        except JSONDecodeError:
-            print('Connection failed. Trying again...')
-            index += 1
-            if index == 20:
-                try:
-                    print('Error. Trying to reconnect...')
+        except JSONDecodeError: # If tracker retrieves incomplete JSON from plugin, tries again.
+            # If runs out of tries (10), reconnects to the plugin (usually helps). Also checks for game, to identify if game is running so it can retry, or shut down.
+            if is_running("eurotrucks2.exe"):
+                print('Error. Trying again...')
+                time.sleep(1)
+                index += 1
+                if index == 10:
                     s.close()
-                    time.sleep(1)
                     s = socket.socket()
                     s.connect(('127.0.0.1', 30001))
-                except:
-                    d = {}
-                    break
-            time.sleep(1)
+                    time.sleep(1)
+                    index = 0
+            elif is_running("amtrucks.exe"):
+                print('Error. Trying again...')
+                time.sleep(1)
+                index += 1
+                if index == 10:
+                    s.close()
+                    s = socket.socket()
+                    s.connect(('127.0.0.1', 30001))
+                    time.sleep(1)
+                    index = 0
+            else:
+                d = {}
+                break
 
 
 def tracker(): # Complete base for job checking and sending
