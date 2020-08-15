@@ -54,14 +54,14 @@ def is_running(name): # Checks for running game
 print(Fore.GREEN + f'Welcome, {_name}!')
 time.sleep(2)
 
-while True: # Checking which game is running and attempting to connect to the plugin
+while True: # Checking which game is running and making base conneciton with plugin
     if is_running("eurotrucks2.exe"):
         print(ansi.clear_screen())
         print(Fore.GREEN + 'ETS2 detected! Checking plugin...')
         time.sleep(2)
         try:
-            s = socket.socket()
-            s.connect(('127.0.0.1', 30001))
+            s = socket.socket(socket.AF_INET)
+            s.connect(('localhost', 30001))
             data = s.recv(20000).decode('utf-8')[8:]
             d = json.loads(data)
             time.sleep(1)
@@ -72,8 +72,8 @@ while True: # Checking which game is running and attempting to connect to the pl
     elif is_running("amtrucks.exe"):
         print(Fore.GREEN + 'ATS detected! Checking plugin...')
         try:
-            s = socket.socket()
-            s.connect(('127.0.0.1', 30001))
+            s = socket.socket(socket.AF_INET)
+            s.connect(('localhost', 30001))
             data = s.recv(20000).decode('utf-8')[8:]
             d = json.loads(data)
             time.sleep(1)
