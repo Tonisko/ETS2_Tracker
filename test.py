@@ -60,9 +60,10 @@ while True: # Checking which game is running and making base conneciton with plu
         print(Fore.GREEN + 'ETS2 detected! Checking plugin...')
         time.sleep(2)
         try:
-            s = socket.socket(socket.AF_INET)
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(('localhost', 30001))
-            data = s.recv(20000).decode('utf-8')[8:]
+            time.sleep(0.5)
+            data = s.recv(18432).decode('utf-8')[8:]
             d = json.loads(data)
             time.sleep(1)
             break
@@ -72,20 +73,15 @@ while True: # Checking which game is running and making base conneciton with plu
     elif is_running("amtrucks.exe"):
         print(Fore.GREEN + 'ATS detected! Checking plugin...')
         try:
-            s = socket.socket(socket.AF_INET)
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(('localhost', 30001))
-            data = s.recv(20000).decode('utf-8')[8:]
+            time.sleep(0.5)
+            data = s.recv(18432).decode('utf-8')[8:]
             d = json.loads(data)
             time.sleep(1)
             break
         except:
             print('Plugin not loaded yet, refreshing...')
-    else:
-        print(ansi.clear_screen())
-        print(Fore.RED + "No game detected /:\\")
-        for i in reversed(range(0, 6)):
-            time.sleep(1)
-            print("Checking again in: " + Fore.YELLOW + str(i))
 
 
 def refresh(): # Base for getting info from plugin
@@ -94,7 +90,7 @@ def refresh(): # Base for getting info from plugin
     index = 0
     while True:
         try:
-            data = s.recv(20000).decode('utf-8')[8:]
+            data = s.recv(18432).decode('utf-8')[8:]
             d = json.loads(data)
             time.sleep(1)
             index = 0
