@@ -1,9 +1,9 @@
 import socket
 import json
 import time
+from math import floor
 import psutil
 import sys
-from math import floor
 from pypresence import Presence
 from threading import Thread
 from json import JSONDecodeError
@@ -11,15 +11,14 @@ from colorama import Fore, ansi, init
 
 init(autoreset=True)
 
-# "logging in" - for job logging purposes
 try:
     f = open('credentials.json', 'r+')
     _f = f.read()
     j = json.loads(_f)
-    print('Logged in!')
+    print(Fore.GREEN + 'Logged in!')
     time.sleep(2)
 except FileNotFoundError:
-    us = input('Please type your Discord tag WITHOUT HASHTAG (ex.: Tonisko5799): ') # Database raises error while creation when there is '#'
+    us = input('Please type your Discord tag WITHOUT HASHTAG (ex.: Tonisko5799): ')
     na = input('Please put your nick for statistics: ')
     js = {"username": us, "nick": na}
     j = json.dumps(js)
@@ -31,7 +30,7 @@ except FileNotFoundError:
     f = open('credentials.json', 'r+')
     _f = f.read()
     j = json.loads(_f)
-    print('Logged in!')
+    print(Fore.GREEN + 'Logged in!')
     time.sleep(1)
 
 user = j["username"]
@@ -39,7 +38,7 @@ _name = j["nick"]
 d = {}
 
 
-def is_running(name): # Checks for running game
+def is_running(name):
     for proc in psutil.process_iter():
         try:
             pinfo = proc.as_dict(attrs=['pid', 'name'])
@@ -54,7 +53,7 @@ def is_running(name): # Checks for running game
 print(Fore.GREEN + f'Welcome, {_name}!')
 time.sleep(2)
 
-while True: # Checking which game is running and making base conneciton with plugin
+while True:
     if is_running("eurotrucks2.exe"):
         print(ansi.clear_screen())
         print(Fore.GREEN + 'ETS2 detected! Checking plugin...')
@@ -62,6 +61,7 @@ while True: # Checking which game is running and making base conneciton with plu
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(('localhost', 30001))
+            s.setblocking(True)
             time.sleep(0.5)
             data = s.recv(18432).decode('utf-8')[8:]
             d = json.loads(data)
@@ -75,6 +75,7 @@ while True: # Checking which game is running and making base conneciton with plu
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(('localhost', 30001))
+            s.setblocking(True)
             time.sleep(0.5)
             data = s.recv(18432).decode('utf-8')[8:]
             d = json.loads(data)
@@ -82,47 +83,55 @@ while True: # Checking which game is running and making base conneciton with plu
             break
         except:
             print('Plugin not loaded yet, refreshing...')
+    else:
+        print(ansi.clear_screen())
+        print(Fore.RED + "No game detected /:\\")
+        for i in reversed(range(0, 6)):
+            time.sleep(1)
+            print("Checking again in: " + Fore.YELLOW + str(i))
 
 
-def refresh(): # Base for getting info from plugin
+def refresh():
     global d
     global s
-    index = 0
     while True:
         try:
             data = s.recv(18432).decode('utf-8')[8:]
+            if d["data"]["status"] != "TELEMETRY":
+                return
             d = json.loads(data)
             time.sleep(1)
-            index = 0
-        except JSONDecodeError: # If tracker retrieves incomplete JSON from plugin, tries again, as fast as possible. This somehow makes data corrent again.
+        except JSONDecodeError:
             if is_running("eurotrucks2.exe"):
                 print('Error. Trying again...')
+                time.sleep(0.25)
             elif is_running("amtrucks.exe"):
                 print('Error. Trying again...')
+                time.sleep(0.25)
             else:
                 d = {}
                 break
 
 
-def tracker(): # Complete base for job checking and sending
+def tracker():
     global d
     while True:
         try:
             while True:
-                if d["data"]["jobData"]["status"] is 0:
+                if d["data"]["jobData"]["status"] == 0:
                     time.sleep(3)
                     print(ansi.clear_screen())
                     print('No job detected, refreshing...')
-                if d["data"]["jobData"]["status"] is 1:
+                if d["data"]["jobData"]["status"] == 1:
                     print(Fore.GREEN + 'Job found!')
                     break
 
             while True:
-                if d["data"]["jobData"]["status"] is 1:
+                if d["data"]["jobData"]["status"] == 1:
                     time.sleep(3)
                     print(ansi.clear_screen())
                     print('On job, refreshing...')
-                if d["data"]["jobData"]["status"] is 2:
+                if d["data"]["jobData"]["status"] == 2:
                     print(Fore.GREEN + 'Job finished! Sending to API...')
                     timetaken = d["data"]["jobData"]["realTimeTaken"]
                     _time = (timetaken / (1000 * 60)) % 60
@@ -156,12 +165,12 @@ def tracker(): # Complete base for job checking and sending
                           "Game": game, "mass": mass, "Truck": "{} {}".format(brand, model)}
                     w = json.dumps(wr)
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock.connect(('ip_address', 4564))
+                    sock.connect(('ip_address', 9999))
                     sock.send(w.encode())
                     sock.close()
                     break
 
-                if d["data"]["jobData"]["status"] is 3:
+                if d["data"]["jobData"]["status"] == 3:
                     print(Fore.GREEN + 'Job cancelled! Sending to API...')
                     timetaken = d["data"]["jobData"]["realTimeTaken"]
                     _time = (timetaken / (1000 * 60)) % 60
@@ -195,23 +204,23 @@ def tracker(): # Complete base for job checking and sending
                           "Game": game, "mass": mass, "Truck": "{} {}".format(brand, model)}
                     w = json.dumps(wr)
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock.connect(('ip_address', 4564))
+                    sock.connect(('ip_address', 9999))
                     sock.send(w.encode())
                     sock.close()
                     break
 
             while True:
                 print(ansi.clear_screen())
-                if d["data"]["jobData"]["status"] is 2:
+                if d["data"]["jobData"]["status"] == 2:
                     print('Waiting for another job...')
                     time.sleep(3)
-                if d["data"]["jobData"]["status"] is 3:
+                if d["data"]["jobData"]["status"] == 3:
                     print('Waiting for another job...')
                     time.sleep(3)
-                if d["data"]["jobData"]["status"] is 1:
+                if d["data"]["jobData"]["status"] == 1:
                     break
-        except Exception as e:
-            print(e)
+        except Exception as _e:
+            print(_e)
             break
 
 
@@ -219,7 +228,7 @@ class base:
     start_time = int(time.time())
 
 
-def rich_presence(): # Discord Rich Presence
+def rich_presence():
     global rpc, d
     if is_running("eurotrucks2.exe"):
         rpc = Presence("731909306256982028")
@@ -256,8 +265,8 @@ def rich_presence(): # Discord Rich Presence
             rpc.update(details=details, state=state, start=start, small_text=small_text, small_image=small_image,
                        large_image=large_image)
             time.sleep(5)
-        except Exception as e:
-            print(e)
+        except Exception as _e:
+            print(_e)
             break
 
 
@@ -270,7 +279,7 @@ _t.start()
 _t.join(timeout=1)
 time.sleep(1)
 rich_presence()
-print(Fore.RED + 'Unable to communicate with plugin, shutting down...')
+print(Fore.RED + 'Game is not running, shutting down...')
 rpc.close()
 time.sleep(3)
 sys.exit(1)
