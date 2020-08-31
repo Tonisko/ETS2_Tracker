@@ -22,4 +22,4 @@ Delivery is saved in database file, plus sent via webkook on main Discord server
 
 **NOTE:** This is only alpha version of tracker, therefore it can contain some bugs. 
 
-This project has been also terminated due to lots of problems and lack of free time for development.
+This project has been also _temporarily_ terminated due to lots of problems and lack of free time for development.
