@@ -21,4 +21,5 @@ Delivery is saved in database file, plus sent via webkook on main Discord server
 
 
 **NOTE:** This is only alpha version of tracker, therefore it can contain some bugs. 
-Join [Alpha testing Discord server](https://discord.com/invite/KuqEDyP) (containing tracker file and bot) in order to test it.
+
+This project has been also terminated due to lots of problems and lack of free time for development.
